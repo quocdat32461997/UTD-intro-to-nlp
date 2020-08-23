@@ -3,6 +3,7 @@ hw1.py - module to implement Python codes to extract text and parse to Person ob
 """
 
 import re
+import pickle
 
 class Person:
 	"""
@@ -43,7 +44,7 @@ class Person:
 				tokens[idx] = 'X' # if name missing, return X instead
 
 		# processing: id
-		id_pattern = "^[A-Za-z][A-Za-z][0-9]{4}"
+		id_pattern = "^[A-Za-z]{2}[0-9]{4}$"
 		while not re.match(id_pattern, tokens[3]):
 			print('ID invalid', tokens[3])
 			print('ID is two letters followed by 4 digits. Please enter a valid id:')
@@ -51,7 +52,7 @@ class Person:
 			tokens[3] = tokens[3].upper()
 
 		# processing phone_no
-		phone_pattern = "^[0-9]{3}-[0-9]{3}-[0-9]{4}"
+		phone_pattern = "^[0-9]{3}-[0-9]{3}-[0-9]{4}$"
 		if not re.match(phone_pattern, tokens[4]):
 			# remove all non-numeric characters
 			tokens[4] = re.sub('[^0-9]', '', tokens[4])
@@ -75,8 +76,26 @@ def main():
 			print("Error person {} exists in data file.".format(p.id))
 
 	# loop over to print Person objects
-	for person in persons:
-		person.display()
+	#for id, person in persons.items():
+	#	print('Employee id: {}'.format(person.id))
+	#	print('\t', person.first_name, person.middle_initial, person.last_name)
+	#	print('\t', person.phone)
+
+	# save to pickle
+	with open('persons', 'wb') as file:
+		pickle.dump(persons, file)
+		file.close()
+
+	# open and verify
+	with open('persons', 'rb') as file:
+		persons = pickle.load(file)
+		file.close()
+
+	# loop over to print Person objects
+	for id, person in persons.items():
+		print('Employee id: {}'.format(person.id))
+		print('\t', person.first_name, person.middle_initial, person.last_name)
+		print('\t', person.phone)
 
 if __name__ == '__main__':
 	main()
