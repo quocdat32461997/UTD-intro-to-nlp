@@ -1,5 +1,9 @@
 """
-main.py - a module for homework 2
+# homework 2
+
+Execute the code snippet below with arguments:
+python3 dqn170000_hw2.py --file ana19.txt
+
 """
 
 # import dependencies
@@ -116,6 +120,7 @@ def guessing_game(commons50):
     """
     print("\nLey's play a word guessing game")
     score = 5
+    cumulative_score = 0
 
     # pick randomly in top 50 commons
     pick = random.randint(0, 50)
@@ -136,17 +141,23 @@ def guessing_game(commons50):
                 for i in range(len(word)):
                     if word[i] == guess:
                         holders[i] = guess
-        else:
+        elif guess != '!':
             score -= 1
             print('Sorry, guess agin. Score is {}'.format(score))
 
         if score < 0 or guess == '!':
             print("End of game.")
+            if cumulative_score == 0 and score > 0:
+                cumulative_score += score
+            print("Your cumulative score is {}".format(cumulative_score))
             break
         elif not '_' in holders:
+            cumulative_score += score
             print('You solved it!')
-            print("Current score is: {}".format(score))
+            print("Current score is {}".format(score))
+            print("Cumulative socre is {}".format(cumulative_score))
             print("Guesss another word")
+            score = 5
             pick = random.randint(0, 50)
             word = commons50[pick]
             holders = ['_']*len(word)
