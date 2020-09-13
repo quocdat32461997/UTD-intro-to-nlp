@@ -1,5 +1,8 @@
 """
 main.py - main module for homework_3
+Author: Dat Ngo
+NET ID: dqn170000
+Date: Sep 12, 2020
 """
 import os
 import re
