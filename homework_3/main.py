@@ -143,10 +143,10 @@ def text_process(inputs):
     inputs = re.sub('--', '', inputs)
 
     # remove all digits
-    inputs = re.sub('\d()', '', inputs)
+    inputs = re.sub('[\d]*', '', inputs)
 
     # remove punctuations
-    inputs = re.sub("[!&^*,./;:\"\\\[\]\{\}\(\)\'\`\-\_\?\<\>\$]", ' ', inputs)
+    inputs = re.sub("[!&^*,./;:\"\\\[\]\{\}\(\)\''\`\-\_\?\<\>\$]", ' ', inputs)
 
     return inputs
 
