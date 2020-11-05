@@ -24,6 +24,9 @@ from bs4 import BeautifulSoup
 engine = create_engine('sqlite://', echo = False)
 
 def main(args):
+	"""
+	main - function to execute howework 5
+	"""
 	# read urls
 	with open(args.url_path) as file:
 		urls = file.read()
@@ -34,12 +37,10 @@ def main(args):
 	texts = []
 	while urls:
 		try:
-			print("Count: {}".format(count))
 			if count < 1:
 				break
 			# retrieve the next url
 			url = urls.pop(0)
-			print(url)
 
 			# web scrape text relevant to given url
 			links, text = web_scrape(url)
@@ -74,9 +75,13 @@ def main(args):
 	kb = create_kb(tf_idf, idf)
 	kb.to_csv(args.kb + '.csv') # write knowledge base dataframe
 
+	# sampel dialog from knowledge base dataframe
+	print('Sample dialog based on Knowledge Base')
+	print('given, an input -cnn news-, select the index of the item with the highest tf-idf score of cnn and news tokens')
+	print(kb[(kb['cnn'] > 1) & (kb['news'] > 0)])
+	
 	# convert to sql
-	sql_kb = kb.to_sql('knowledge_base', con=engine)
-
+	sql_kb = kb.tosql('knowledge_base', con=engine)
 	return None	
 
 def create_kb(tf_idf, idf):
@@ -101,15 +106,13 @@ def create_kb(tf_idf, idf):
 
 def term_freq(inputs):
 	"""
-	term_freq - function to build frequencey dictionary, find important bi-gram terms, and build knowledge base
-	Knowledge base, I define, is the dictionary of keys (bigrams to describe the text) and values (tokens of the text)
+	term_freq - function to build knowledge base by term-frequency and inverse-document-frequency 
 	Inputs:
 		- inputs : list of String
 			List of texts
 	Outputs:
-		- terms : frequencey dictioanry
-		- top_terms : sorted important bigram terms
-		- temp_docs : knowledge base as dictionary
+		- tf-idf : term-frequency-inverse-document-frequencey dictioanry
+		- idf : inverse-document-frequency dictionary
 	"""
 
 	tf_idf_dict = {} # key - unqiue integer encoding each text, and values are dictionary of {key=token, vales=coutn} 
@@ -154,7 +157,16 @@ def term_freq(inputs):
 			tf_idf_dict[doc][token] *= idf_dict[token]
 			
 	return tf_idf_dict, idf_dict
+
 def web_scrape(url):
+	"""
+	web_scrape - function to query html content from url, and scarape all text and urls
+	Inputs:
+		- url : string (given url)
+	Outputs:
+		- urls : relevant urls in the queried html content
+		- text : text scrapped from the given url 
+	"""
 	#query html
 	html = requests.get(url)
 
@@ -173,9 +185,17 @@ def web_scrape(url):
 			l = os.path.join(url, l[1:]) if not l.startswith('https') else l
 			urls.append(l)
 
-	return urls, soup.get_text()
+	text = soup.get_text()
+	return urls, text
 
 def clean_text(text):
+	"""
+	clean_text - function to remove stop-words, punctuations, and tokenize sentences
+	Inputs:
+		- text : String
+	Outputs:
+		- sents : list of preprocessed sentences
+	"""
 	# remove newlines and tabs
 	text = re.sub('[\t\n]*', '', text)
 
